@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="./style.css">
+        <script defer src="./index.js"></script>
+        <script defer src="./listeners.js"></script>
+    </head>
+    <body>
+        <label for="scale">Scale for the ratings</label>
+        <input type="number" min="1" id="scale" />
+        <label for="emoji">Character/emoji to use</label>
+        <input type="text" max="3" id="emoji" />
+        <p id="advanced">Advanced <span id="arrow">v</span></p>
+        <div id="hidden" class="hidden">
+            <label for="api">
+                Youtube v3 API Key
+                <a href="https://developers.google.com/youtube/registering_an_application" target="_blank">
+                    (How to get one)
+                </a>
+            </label>
+            <input type="text" id="api" />
+            <button id="restore">Restore API key</button>
+            <button id="reset">Reset all settings to default</button>
+        </div>
+	<p id="saved"></p>
+    </body>
+</html>
