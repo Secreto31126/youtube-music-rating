@@ -17,7 +17,7 @@ jobs:
       with:
         name: zip
         path: ymr.zip
-        retention-days: 10
+
   publish:
     needs: zip
     runs-on: ubuntu-latest
