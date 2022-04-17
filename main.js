@@ -82,7 +82,7 @@ function addRatings(views, stars, emoji) {
 
     for (let el = 0, rate = 0; el < songs.length; el++, rate++) {
         // If it's a private song (AKA we can't get its data), skip it
-        if (isPrivateRegex.test(a[el].href)) {
+        if (isPrivateRegex.test(a[el]?.href)) {
             // Don't increse rate counter
             rate--;
             songs[el].innerHTML += `<span id="rating" title="Private song, unable to parse data"> ❓</span>`;
