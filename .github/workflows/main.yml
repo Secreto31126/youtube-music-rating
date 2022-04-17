@@ -28,7 +28,7 @@ jobs:
       with:
         name: zip
 
-    - uses: Secreto31126/chrome-addon@v3
+    - uses: trmcnvn/chrome-addon@v2
       with:
         extension: ckmghhopnoeddmnlnploommajnnkhjjj
         zip: ymr.zip
