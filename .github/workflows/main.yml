@@ -11,18 +11,26 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - run: zip -r YMR.zip * -x *.md -x .*/
+    - run: zip -r ymr.zip * -x *.md -x .*/
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: zip
+        path: ymr.zip
+        retention-days: 10
 
   publish:
     needs: zip
     runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v3
+
+    - uses: actions/download-artifact@v3
+      with:
+        name: zip
+
     - uses: trmcnvn/chrome-addon@v2
       with:
         extension: ckmghhopnoeddmnlnploommajnnkhjjj
-        zip: YMR.zip
+        zip: ymr.zip
         client-id: ${{ secrets.CHROME_CLIENT_ID }}
         client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
         refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
