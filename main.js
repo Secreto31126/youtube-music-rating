@@ -8,11 +8,12 @@ class API {
         return (await fetch("https://www.googleapis.com/youtube/v3" + request)).json();
     }
     
+    // Unfortunately, the recursive function seems to be breaking the API requests limit. Removed.
     async getPlaylist(id, pageToken) {
         // Request for a single page of 50 videos max
         const res = await this.get(
             `/playlistItems?part=contentDetails&playlistId=${id}&maxResults=50&key=${this.key}`
-            + (pageToken ? `&pageToken=${pageToken}` : "")  // pageToken is used for recursion
+            // + (pageToken ? `&pageToken=${pageToken}` : "")  // pageToken is used for recursion
         );
 
         if (res.error) throw res.error;
@@ -20,7 +21,7 @@ class API {
         const pages = [ res.items ];
 
         // If the playlist contains over 50 videos, request the next page and merge the results
-        if (res.nextPageToken) pages.push(...(await this.getPlaylist(id, res.nextPageToken)));
+        // if (res.nextPageToken) pages.push(...(await this.getPlaylist(id, res.nextPageToken)));
 
         // Expected output: [ [ first page ], [ second page ], ... ]
         return pages;
