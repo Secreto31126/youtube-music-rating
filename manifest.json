@@ -1,7 +1,7 @@
 {
     "name": "Youtube Music Ratings",
     "description": "Find out which song is the most popular within an album or public playlist based on the community listenings.",
-    "version": "1.4.2",
+    "version": "1.5.0",
     "manifest_version": 3,
     "content_scripts": [
         {
