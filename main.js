@@ -1,14 +1,24 @@
 class API {
+    /**
+     * @param {string} key
+     */
     constructor(key) {
         if (!key) throw new Error("Missing API key, please make sure you added it in the extension's settings");
         this.key = key;
     }
-    
+
+    /**
+     * @param {string} request
+     */
     async get(request) {
         return (await fetch("https://www.googleapis.com/youtube/v3" + request)).json();
     }
-    
-    // Unfortunately, the recursive function seems to be breaking the API requests limit. Removed.
+
+    /**
+     * Unfortunately, the recursive function seems to be breaking the API requests limit. Removed.
+     * @param {string} id
+     * @param {undefined} [pageToken]
+     */
     async getPlaylist(id, pageToken) {
         // Request for a single page of 50 videos max
         const res = await this.get(
@@ -18,7 +28,7 @@ class API {
 
         if (res.error) throw res.error;
 
-        const pages = [ res.items ];
+        const pages = [res.items];
 
         // If the playlist contains over 50 videos, request the next page and merge the results
         // if (res.nextPageToken) pages.push(...(await this.getPlaylist(id, res.nextPageToken)));
@@ -26,7 +36,10 @@ class API {
         // Expected output: [ [ first page ], [ second page ], ... ]
         return pages;
     }
-    
+
+    /**
+     * @param {any[]} pages
+     */
     async getVideos(pages) {
         const videos = [];
 
@@ -46,12 +59,16 @@ class API {
     }
 }
 
+/**
+ * @param {number[]} views - Array of views
+ * @param {number} n - Number of stars
+ */
 function getRatings(views, n) {
     // Find the most viewed video
     const max = Math.max(...views);
 
     // Divide in n categories (max * 1/5, max * 2/5, ..., max * (n - 1) / n)
-    const groups = new Array(n - 1).fill().map((e, i) => max * (i + 1) / n);
+    const groups = new Array(n - 1).fill(0).map((_, i) => max * (i + 1) / n);
 
     // If views doesn't meet the requirements for the next group limit, break, else add a star to the rating
     // O(views ^ n) && o(views - 1 + n - 1)
@@ -65,40 +82,45 @@ function getRatings(views, n) {
     return ratings;
 }
 
+/**
+ * @param {number[]} views - Array of views
+ * @param {number} stars - Number of stars
+ * @param {string} emoji - Emoji to represent the rating
+ */
 function addRatings(views, stars, emoji) {
     const ratings = getRatings(views, stars);
 
     // Find the rendered list
-    const list = document.querySelector("ytmusic-section-list-renderer");
+    const list = document.querySelectorAll("#secondary #contents #contents ytmusic-responsive-list-item-renderer");
 
-    // Find the songs elements
-    const songs = list.querySelectorAll(".title-column > yt-formatted-string")
-
-    // Get the songs' a elements (the href is used to know if a song is private)
-    // Some songs might have more than one artist, so the first one is used
-    const a = list.querySelectorAll(".secondary-flex-columns > yt-formatted-string:nth-child(1) > a:nth-child(1)");
-    
     // Regex to check if the video is private
     const isPrivateRegex = /FEmusic_library_privately_owned/;
 
-    for (let el = 0, rate = 0; el < songs.length; el++, rate++) {
-        // If it's a private song (AKA we can't get its data), skip it
-        if (isPrivateRegex.test(a[el]?.href)) {
-            // Don't increse rate counter
+    for (let i = 0, rate = 0; i < list.length; i++, rate++) {
+        const elem = list[i];
+        const text = elem.querySelector("yt-formatted-string.title");
+
+        if (!text) {
             rate--;
-            songs[el].innerHTML += `<span id="rating" title="Private song, unable to parse data"> ❓</span>`;
+            continue;
+        }
+
+        // If it's a private song (AKA we can't get its data), skip it
+        if (isPrivateRegex.test(elem["secondary-flex-columns"])) {
+            rate--;
+            text.innerHTML += `<span id="rating" title="Private song, unable to parse data"> ❓</span>`;
             continue;
         }
 
         // Add the rating
         const viewsString = Number(views[rate]).toLocaleString();
-        songs[el].innerHTML += `<span id="rating" title="${viewsString} views"> ${emoji.repeat(ratings[rate])}</span>`;
+        text.innerHTML += `<span id="rating" title="${viewsString} views"> ${emoji.repeat(ratings[rate])}</span>`;
     }
 }
 
 async function main(href = window.location.href) {
     // Check if there has been an update in user's settings
-    const userSettings = await new Promise((res, rej) => {
+    const userSettings = await new Promise((res) => {
         chrome.storage.sync.get(["api", "scale", "emoji"], data => {
             res(data);
         })
@@ -111,10 +133,10 @@ async function main(href = window.location.href) {
 
     const playlist = new URL(href).searchParams.get("list");
     if (!playlist) return "No playlist id found";
-    
+
     const ids = (await YT.getPlaylist(playlist)).map(page => page.map(item => item.contentDetails.videoId));
     const views = (await YT.getVideos(ids)).map(item => parseInt(item.statistics.viewCount));
-    
+
     addRatings(views, userSettings.scale, userSettings.emoji);
 
     return "Success";
