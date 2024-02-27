@@ -10,7 +10,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - run: zip -r ymr.zip * -x *.md -x .*/
+    - run: zip -r ymr.zip * -x *.md -x package*.json -x .*/
 
     - uses: actions/upload-artifact@v3
       with:
