@@ -3,6 +3,8 @@ chrome.runtime.onInstalled.addListener(() => {
         api: "AIzaSyDmrhNaBDjrMvSLWpFWUZBT_-LVTjVhgSI",
         scale: 5,
         emoji: "🌟",
+        selectors_list_entry: "#contents #contents ytmusic-responsive-list-item-renderer",
+        selectors_entry_title: "yt-formatted-string.title"
     }
     data.default = JSON.parse(JSON.stringify(data));
 

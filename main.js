@@ -86,19 +86,20 @@ function getRatings(views, n) {
  * @param {number[]} views - Array of views
  * @param {number} stars - Number of stars
  * @param {string} emoji - Emoji to represent the rating
+ * @param {{ list_entry: string; entry_title: string }} selectors - Selectors for the list entry and the title within
  */
-function addRatings(views, stars, emoji) {
+function addRatings(views, stars, emoji, selectors) {
     const ratings = getRatings(views, stars);
 
     // Find the rendered list
-    const list = document.querySelectorAll("#secondary #contents #contents ytmusic-responsive-list-item-renderer");
+    const list = document.querySelectorAll(selectors.list_entry);
 
     // Regex to check if the video is private
     const isPrivateRegex = /FEmusic_library_privately_owned/;
 
     for (let i = 0, rate = 0; i < list.length; i++, rate++) {
         const elem = list[i];
-        const text = elem.querySelector("yt-formatted-string.title");
+        const text = elem.querySelector(selectors.entry_title);
 
         if (!text) {
             rate--;
@@ -121,7 +122,7 @@ function addRatings(views, stars, emoji) {
 async function main(href = window.location.href) {
     // Check if there has been an update in user's settings
     const userSettings = await new Promise((res) => {
-        chrome.storage.sync.get(["api", "scale", "emoji"], data => {
+        chrome.storage.sync.get(["api", "scale", "emoji", "selectors_list_entry", "selectors_entry_title"], data => {
             res(data);
         })
     });
@@ -137,7 +138,15 @@ async function main(href = window.location.href) {
     const ids = (await YT.getPlaylist(playlist)).map(page => page.map(item => item.contentDetails.videoId));
     const views = (await YT.getVideos(ids)).map(item => parseInt(item.statistics.viewCount));
 
-    addRatings(views, userSettings.scale, userSettings.emoji);
+    addRatings(
+        views,
+        userSettings.scale,
+        userSettings.emoji,
+        {
+            list_entry: userSettings.selectors_list_entry,
+            entry_title: userSettings.selectors_entry_title
+        }
+    );
 
     return "Success";
 }

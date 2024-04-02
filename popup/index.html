@@ -10,8 +10,27 @@
         <input type="number" min="1" id="scale" />
         <label for="emoji">Character/emoji to use</label>
         <input type="text" max="3" id="emoji" />
+
         <p id="advanced">Advanced <span id="arrow">v</span></p>
         <div id="hidden" class="hidden">
+            <label for="selectors_list_entry">
+                CSS selectors for the list entries
+                <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors" target="_blank">
+                    (How to use them)
+                </a>
+            </label>
+            <input type="text" id="selectors_list_entry" />
+
+            <label for="selectors_entry_title">
+                CSS selectors for the title within the list entries
+                <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors" target="_blank">
+                    (How to use them)
+                </a>
+            </label>
+            <input type="text" id="selectors_entry_title" />
+
+            <button id="restore_selectors">Restore Selectors</button>
+
             <label for="api">
                 Youtube v3 API Key
                 <a href="https://developers.google.com/youtube/registering_an_application" target="_blank">
@@ -19,7 +38,9 @@
                 </a>
             </label>
             <input type="text" id="api" />
-            <button id="restore">Restore API key</button>
+
+            <button id="restore_api">Restore API key</button>
+
             <button id="reset">Reset all settings to default</button>
         </div>
 	<p id="saved"></p>

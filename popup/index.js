@@ -1,6 +1,6 @@
 // On open
 let timer;
-chrome.storage.sync.get(["api", "scale", "emoji"], data => {
+chrome.storage.sync.get(["api", "scale", "emoji", "selectors_list_entry", "selectors_entry_title"], data => {
     addData(data);
 });
 
@@ -27,7 +27,7 @@ function save(e) {
 
     // Save the data
     chrome.storage.sync.set({ [e.id]: e.value }, () => {
-        const p = document.querySelector("#saved");
+        const p = /** @type {HTMLInputElement} */ (document.querySelector("#saved"));
         p.innerText = "Saved!";
         clearTimeout(timer);
         timer = setTimeout(() => p.innerText = "", 3000);
@@ -38,5 +38,7 @@ function save(e) {
 function invalidData(e) {
     if (e.id === "scale" && e.value < 1) return true;
     if (e.id === "emoji" && !e.value) return true;
+    if (e.id === "selectors_list_entry" && !e.value) return true;
+    if (e.id === "selectors_entry_title" && !e.value) return true;
     if (e.id === "api" && !e.value) return true;
 }
